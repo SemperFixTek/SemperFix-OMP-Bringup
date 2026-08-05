@@ -1,11 +1,21 @@
 <#
 SemperFix OMP Standard Installer
-Version: 1.0.0
+Version: 1.0.1
 Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-Write-Host "=== SemperFix OMP Installer v1.0.0 ===" -ForegroundColor Cyan
+Write-Host "=== SemperFix OMP Installer v1.0.1 ===" -ForegroundColor Cyan
+
+# Resolve repo root explicitly
+$repoRoot = Split-Path $PSScriptRoot -Parent
+
+$binDir    = Join-Path $repoRoot "bin"
+$themesDir = Join-Path $repoRoot "themes"
+$fontsDir  = Join-Path $repoRoot "fonts"
+
+# Target directory
+$ompDir = "$env:LOCALAPPDATA\Programs\oh-my-posh"
 
 # ------------------------------------------------------------
 # 1. Remove Microsoft Store remnants
@@ -25,34 +35,31 @@ Rename-Item "$winApps\oh-my-posh.ps1" "oh-my-posh.ps1.bak" -ErrorAction Silently
 # 3. Create SemperFix OMP directory
 # ------------------------------------------------------------
 Write-Host "[3/8] Creating SemperFix OMP directory..."
-$ompDir = "$env:LOCALAPPDATA\Programs\oh-my-posh"
 New-Item -ItemType Directory -Path $ompDir -Force | Out-Null
 
 # ------------------------------------------------------------
 # 4. Copy binary
 # ------------------------------------------------------------
 Write-Host "[4/8] Installing oh-my-posh.exe..."
-Copy-Item "$PSScriptRoot\..\bin\oh-my-posh.exe" "$ompDir\oh-my-posh.exe" -Force
+Copy-Item "$binDir\oh-my-posh.exe" "$ompDir\oh-my-posh.exe" -Force
 
 # ------------------------------------------------------------
 # 5. Copy themes
 # ------------------------------------------------------------
 Write-Host "[5/8] Installing themes..."
-Copy-Item "$PSScriptRoot\..\themes" "$ompDir\themes" -Recurse -Force
+Copy-Item $themesDir "$ompDir\themes" -Recurse -Force
 
 # ------------------------------------------------------------
 # 6. Install fonts (admin-free)
 # ------------------------------------------------------------
 Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts..."
 
-$fontSource = "$PSScriptRoot\..\fonts"
-
 Add-Type -Namespace Win32 -Name FontStuff -MemberDefinition @"
     [DllImport("gdi32.dll", SetLastError=true)]
     public static extern int AddFontResource(string lpFileName);
 "@
 
-Get-ChildItem -Path $fontSource -Filter *.ttf | ForEach-Object {
+Get-ChildItem -Path $fontsDir -Filter *.ttf | ForEach-Object {
     $fontFile = $_.FullName
     Write-Host "Installing font: $($_.Name)"
 
@@ -105,7 +112,7 @@ Add-Content -Path $PROFILE -Value $profileBlock
 # Verification
 # ------------------------------------------------------------
 Write-Host ""
-Write-Host "=== Verifying SemperFix OMP Package v1.0.0 ===" -ForegroundColor Yellow
+Write-Host "=== Verifying SemperFix OMP Package v1.0.1 ===" -ForegroundColor Yellow
 
 if (-not (Test-Path "$ompDir\oh-my-posh.exe")) {
     Write-Host "ERROR: Missing binary." -ForegroundColor Red
@@ -115,10 +122,6 @@ if (-not (Test-Path "$ompDir\themes\paradox.omp.json")) {
     Write-Host "ERROR: Missing theme." -ForegroundColor Red
 }
 
-if (-not (Get-ChildItem "$env:WINDIR\Fonts" | Where-Object { $_.Name -like "*JetBrainsMono*" })) {
-    Write-Host "WARNING: Fonts may not be fully registered." -ForegroundColor Yellow
-}
-
 Write-Host "Verification complete." -ForegroundColor Green
-Write-Host "SemperFix OMP Package Version: 1.0.0" -ForegroundColor Yellow
+Write-Host "SemperFix OMP Package Version: 1.0.1" -ForegroundColor Yellow
 Write-Host "Restart Windows Terminal to apply changes." -ForegroundColor Cyan
