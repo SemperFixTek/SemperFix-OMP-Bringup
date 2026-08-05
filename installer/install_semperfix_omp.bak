@@ -41,17 +41,12 @@ Copy-Item "$PSScriptRoot\..\fonts\*.ttf" $fontDir -Force
 # 7. Fix PATH precedence
 Write-Host "[7/8] Updating PATH..."
 $correctPath = "$env:LOCALAPPDATA\Programs\oh-my-posh"
-if (-not ($env:Path -split ";" | Where-Object { $_ -eq $correctPath })) {
+if (-not ($env:Path -split ";" | Select-String $correctPath)) {
     $env:Path = "$correctPath;" + $env:Path
 }
 
 # 8. Update PowerShell profile
 Write-Host "[8/8] Updating PowerShell profile..."
-$profileDir = Split-Path $PROFILE
-if (-not (Test-Path $profileDir)) {
-    New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
-}
-
 $profileBlock = @"
 `$env:POSH_THEMES_PATH = "`$env:LOCALAPPDATA\Programs\oh-my-posh\themes"
 oh-my-posh init pwsh --config "`$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression
