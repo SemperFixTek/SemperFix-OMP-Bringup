@@ -57,14 +57,7 @@ Get-ChildItem -Path $fontSource -Filter *.ttf | ForEach-Object {
     }
 }
 
-# Notify system of font change
-$shell = New-Object -ComObject Shell.Application
-$shell.Namespace(0x14).ParseName("Fonts").InvokeVerb("update")
-
-# Notify system of font change
-$shell = New-Object -ComObject Shell.Application
-$shell.Namespace(0x14).ParseName("Fonts").InvokeVerb("update")
-
+# No shell refresh needed — Windows handles this automatically
 # 7. Fix PATH precedence
 Write-Host "[7/8] Updating PATH..."
 $correctPath = "$env:LOCALAPPDATA\Programs\oh-my-posh"
