@@ -35,8 +35,24 @@ Copy-Item "$PSScriptRoot\..\themes" "$ompDir\themes" -Recurse -Force
 
 # 6. Install fonts
 Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts..."
-$fontDir = "$env:WINDIR\Fonts"
-Copy-Item "$PSScriptRoot\..\fonts\*.ttf" $fontDir -Force
+
+$fontSource = "$PSScriptRoot\..\fonts"
+$fontTarget = "$env:WINDIR\Fonts"
+
+# COM object for proper font registration
+$Shell = New-Object -ComObject Shell.Application
+$FontsFolder = $Shell.NameSpace($fontTarget)
+
+Get-ChildItem -Path $fontSource -Filter *.ttf | ForEach-Object {
+    $fontFile = $_.FullName
+    Write-Host "Installing font: $($_.Name)"
+
+    # Copy the file into the Fonts folder
+    Copy-Item $fontFile $fontTarget -Force
+
+    # Register the font with Windows
+    $FontsFolder.CopyHere($fontFile, 0x10)
+}
 
 # 7. Fix PATH precedence
 Write-Host "[7/8] Updating PATH..."
