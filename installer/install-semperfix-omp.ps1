@@ -33,26 +33,37 @@ Copy-Item "$PSScriptRoot\..\bin\oh-my-posh.exe" "$ompDir\oh-my-posh.exe" -Force
 Write-Host "[5/8] Installing themes..."
 Copy-Item "$PSScriptRoot\..\themes" "$ompDir\themes" -Recurse -Force
 
-# 6. Install fonts
+# 6. Install fonts (Admin-free, Windows API method)
 Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts..."
 
 $fontSource = "$PSScriptRoot\..\fonts"
-$fontTarget = "$env:WINDIR\Fonts"
 
-# COM object for proper font registration
-$Shell = New-Object -ComObject Shell.Application
-$FontsFolder = $Shell.NameSpace($fontTarget)
+# Load GDI AddFontResource API
+Add-Type -Namespace Win32 -Name FontStuff -MemberDefinition @"
+    [DllImport("gdi32.dll", SetLastError=true)]
+    public static extern int AddFontResource(string lpFileName);
+"@
 
 Get-ChildItem -Path $fontSource -Filter *.ttf | ForEach-Object {
     $fontFile = $_.FullName
     Write-Host "Installing font: $($_.Name)"
 
-    # Copy the file into the Fonts folder
-    Copy-Item $fontFile $fontTarget -Force
+    $result = [Win32.FontStuff]::AddFontResource($fontFile)
 
-    # Register the font with Windows
-    $FontsFolder.CopyHere($fontFile, 0x10)
+    if ($result -gt 0) {
+        Write-Host "Font installed successfully: $($_.Name)"
+    } else {
+        Write-Host "WARNING: Font may already be installed or registration failed: $($_.Name)" -ForegroundColor Yellow
+    }
 }
+
+# Notify system of font change
+$shell = New-Object -ComObject Shell.Application
+$shell.Namespace(0x14).ParseName("Fonts").InvokeVerb("update")
+
+# Notify system of font change
+$shell = New-Object -ComObject Shell.Application
+$shell.Namespace(0x14).ParseName("Fonts").InvokeVerb("update")
 
 # 7. Fix PATH precedence
 Write-Host "[7/8] Updating PATH..."
