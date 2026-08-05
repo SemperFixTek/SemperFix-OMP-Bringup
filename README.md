@@ -18,9 +18,13 @@ cd SemperFix-OMP-Bringup\installer
 .\install_semperfix_omp.ps1
 Restart Windows Terminal.
 
-Notes
-Do NOT install Oh-My-Posh from the Microsoft Store.
+## Notes
 
-This kit bypasses winget entirely.
+1. Do NOT install Oh-My-Posh from the Microsoft Store.
 
-WindowsApps shadowing is automatically mitigated.
+2 This kit bypasses winget entirely.
+
+3 WindowsApps shadowing is automatically mitigated.
+
+4 Font Selection & Delugia Deprecation - Check out README in /fonts regarding font selection
+  
