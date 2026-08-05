@@ -1,0 +1,26 @@
+{
+  "package": "SemperFix OMP Bring-Up",
+  "version": "1.0.0",
+  "release_date": "2026-08-04",
+  "maintainer": "Bruce (SemperFix)",
+  "location": "Ventura, CA",
+  "components": {
+    "binary": "bin/oh-my-posh.exe",
+    "themes": [
+      "themes/paradox.omp.json"
+    ],
+    "fonts": [
+      "fonts/JetBrainsMonoNerdFont-Regular.ttf",
+      "fonts/JetBrainsMonoNerdFont-Bold.ttf",
+      "fonts/JetBrainsMonoNerdFontMono-Regular.ttf"
+    ],
+    "installer": "installer/install_semperfix_omp.ps1",
+    "documentation": "docs/SemperFix-OMP-Bringup-Card.pdf"
+  },
+  "notes": {
+    "font_standard": "JetBrainsMono Nerd Font (Delugia deprecated upstream)",
+    "theme_standard": "Paradox (SemperFix Standard)",
+    "binary_source": "Pinned GitHub release binary",
+    "purpose": "Deterministic, drift-free terminal environment for MASTERZERO → SECONDARY → OFFSITE"
+  }
+}
