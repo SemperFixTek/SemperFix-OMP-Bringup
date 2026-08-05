@@ -31,9 +31,10 @@ Write-Host "[5/8] Installing themes..."
 Copy-Item "$PSScriptRoot\..\themes" "$ompDir\themes" -Recurse -Force
 
 # 6. Install fonts
-Write-Host "[6/8] Installing Nerd Fonts..."
+Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts..."
 $fontDir = "$env:WINDIR\Fonts"
 Copy-Item "$PSScriptRoot\..\fonts\*.ttf" $fontDir -Force
+
 
 # 7. Fix PATH precedence
 Write-Host "[7/8] Updating PATH..."
