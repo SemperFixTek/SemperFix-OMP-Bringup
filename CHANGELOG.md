@@ -26,3 +26,17 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 ### Planned
 - Certified stable release after v0.9.0 validation
 - No changes expected unless issues discovered during pre-release testing
+
+---
+
+## [1.0.1] - Running debugging 
+### Problems
+- Powerline glyfs are in fallback mode, not conforming to desired state
+- seems to be happening with MSIX buids sandboxing
+
+---
+
+## [1.0.2] - Theme errors found
+### solutions
+- Buildup automation build theme mission $schema headers.
+- Using standard theme from designer to resolve for now before customising.

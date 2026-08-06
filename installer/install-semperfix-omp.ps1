@@ -1,11 +1,13 @@
 <#
 SemperFix OMP Standard Installer
-Version: 1.0.1
+Version: $scriptVersion
 Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-Write-Host "=== SemperFix OMP Installer v1.0.1 ===" -ForegroundColor Cyan
+$scriptVersion = "1.0.2"
+
+Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 
 # Resolve repo root explicitly
 $repoRoot = Split-Path $PSScriptRoot -Parent
@@ -112,7 +114,7 @@ Add-Content -Path $PROFILE -Value $profileBlock
 # Verification
 # ------------------------------------------------------------
 Write-Host ""
-Write-Host "=== Verifying SemperFix OMP Package v1.0.1 ===" -ForegroundColor Yellow
+Write-Host "=== Verifying SemperFix OMP Package v$scriptVersion ===" -ForegroundColor Yellow
 
 if (-not (Test-Path "$ompDir\oh-my-posh.exe")) {
     Write-Host "ERROR: Missing binary." -ForegroundColor Red
@@ -123,5 +125,5 @@ if (-not (Test-Path "$ompDir\themes\paradox.omp.json")) {
 }
 
 Write-Host "Verification complete." -ForegroundColor Green
-Write-Host "SemperFix OMP Package Version: 1.0.1" -ForegroundColor Yellow
+Write-Host "SemperFix OMP Package Version: $scriptVersion" -ForegroundColor Yellow
 Write-Host "Restart Windows Terminal to apply changes." -ForegroundColor Cyan
