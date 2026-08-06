@@ -5,7 +5,7 @@ Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-$scriptVersion = "1.0.2"
+$scriptVersion = "1.0.3"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 

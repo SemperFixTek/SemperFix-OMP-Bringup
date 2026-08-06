@@ -39,4 +39,14 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 ## [1.0.2] - Theme errors found
 ### solutions
 - Buildup automation build theme mission $schema headers.
-- Using standard theme from designer to resolve for now before customising.
+- Using standard theme from designer to resolve for now before\n
+  customizing and modifying.
+
+---
+
+## [1.0.3] - Installer improvements
+### Added / Fixed
+- Updated `installer\install-semperfix-omp.ps1` to version `1.0.3`
+- Improved JetBrainsMono Nerd Font installation feedback
+- Hardened persistent user `PATH` update for OMP install directory
+- Ensured PowerShell profile auto-configuration writes the correct theme path
