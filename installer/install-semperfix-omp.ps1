@@ -108,7 +108,7 @@ $profileBlock = @"
 oh-my-posh init pwsh --config "`$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression
 "@
 
-Add-Content -Path $PROFILE -Value $profileBlock
+Set-Content -Path $PROFILE -Value $profileBlock
 
 # ------------------------------------------------------------
 # Verification
