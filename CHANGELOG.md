@@ -75,3 +75,4 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 - Improved installer maintainability by reducing hard-coded theme references to a single definition
 - Ensured the profile initialization and verification steps reference the same theme definition
 - Kept the installer behavior aligned with the current SemperFix theme package layout
+- Added complete font package for Jetbrains fonts
