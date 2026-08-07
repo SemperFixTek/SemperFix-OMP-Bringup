@@ -65,9 +65,9 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 
 ---
 
-## [1.0.6] - Installer version and theme configuration update
+## [1.0.7] - Installer version and theme configuration update
 ### Added / Fixed
-- Updated `installer\install-semperfix-omp.ps1` to version `1.0.6`
+- Updated `installer\install-semperfix-omp.ps1` to version `1.0.7`
 - Hardened theme deployment by removing stale theme folders and copying the current theme set deterministically
 - Centralized the selected theme filename in a configurable variable at the top of `installer\install-semperfix-omp.ps1`
 - Switched the installer to use the `microverse-power.omp.json` theme via a configurable `$themeFileName` variable

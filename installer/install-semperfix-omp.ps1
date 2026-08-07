@@ -5,7 +5,7 @@ Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-$scriptVersion = "1.0.6"
+$scriptVersion = "1.0.7"
 $themeFileName = "microverse-power.omp.json"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
@@ -141,11 +141,12 @@ if (Test-Path $PROFILE) {
     Remove-Item $PROFILE -Force
 }
 
-$profileBlock = @'
-# SemperFix OMP Profile Block v1.0.4
-$env:POSH_THEMES_PATH = "$env:LOCALAPPDATA\Programs\oh-my-posh\themes"
-oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\$themeFileName" | Invoke-Expression
-'@
+$profileBlock = @"
+# SemperFix OMP Profile Block v1.0.6
+`$env:POSH_THEMES_VERSION = '$themeFileName'
+`$env:POSH_THEMES_PATH = '$env:LOCALAPPDATA\Programs\oh-my-posh\themes'
+oh-my-posh init pwsh --config '$env:LOCALAPPDATA\Programs\oh-my-posh\themes\$themeFileName' | Invoke-Expression
+"@
 
 Set-Content -Path $PROFILE -Value $profileBlock
 
