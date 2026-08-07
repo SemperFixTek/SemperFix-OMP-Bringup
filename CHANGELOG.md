@@ -44,9 +44,9 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 
 ---
 
-## [1.0.3] - Installer improvements
+## [1.9.0] - Installer improvements
 ### Added / Fixed
-- Updated `installer\install-semperfix-omp.ps1` to version `1.0.3`
+- Updated `installer\install-semperfix-omp.ps1` to version `1.9.0`
 - Improved JetBrainsMono Nerd Font installation feedback
 - Hardened persistent user `PATH` update for OMP install directory
 - Ensured PowerShell profile auto-configuration writes the correct theme path
@@ -76,3 +76,14 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 - Ensured the profile initialization and verification steps reference the same theme definition
 - Kept the installer behavior aligned with the current SemperFix theme package layout
 - Added complete font package for Jetbrains fonts
+
+---
+
+## [2.0.0] — 2026-08-07
+### Added / Fixed
+- Updated `installer\install-semperfix-omp.ps1` to version `2.0.0`
+- Improved the installer flow for cleaner, more repeatable Oh-My-Posh setup on Windows 10/11
+- Strengthened PowerShell engine detection for MSIX and system-installed `pwsh` environments
+- Improved cleanup of Microsoft Store and WindowsApps remnants before reinstalling Oh-My-Posh
+- Standardized theme deployment around the SemperFix theme bundle with a configurable theme filename
+- Hardened PowerShell profile initialization and verification output for more reliable onboarding
