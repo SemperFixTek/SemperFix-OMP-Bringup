@@ -5,13 +5,12 @@ Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-$scriptVersion = "1.0.3"
+$scriptVersion = "1.0.4"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 
 # Resolve repo root explicitly
-$repoRoot = Split-Path $PSScriptRoot -Parent
-
+$repoRoot  = Split-Path $PSScriptRoot -Parent
 $binDir    = Join-Path $repoRoot "bin"
 $themesDir = Join-Path $repoRoot "themes"
 $fontsDir  = Join-Path $repoRoot "fonts"
@@ -20,10 +19,33 @@ $fontsDir  = Join-Path $repoRoot "fonts"
 $ompDir = "$env:LOCALAPPDATA\Programs\oh-my-posh"
 
 # ------------------------------------------------------------
+# 0. Detect PowerShell engine (MSIX vs system)
+# ------------------------------------------------------------
+Write-Host "[0/8] Detecting PowerShell engine..." -ForegroundColor Cyan
+
+$msixPwsh   = "$env:LOCALAPPDATA\Microsoft\WindowsApps\Microsoft.PowerShell_8wekyb3d8bbwe\pwsh.exe"
+$systemPwsh = "C:\Program Files\PowerShell\7\pwsh.exe"
+
+if (Test-Path $msixPwsh) {
+    Write-Host "Using MSIX PowerShell: $msixPwsh"
+} elseif (Test-Path $systemPwsh) {
+    Write-Host "WARNING: MSIX PowerShell not found, using system PowerShell: $systemPwsh" -ForegroundColor Yellow
+} else {
+    Write-Host "WARNING: No explicit pwsh.exe detected; relying on PATH resolution." -ForegroundColor Yellow
+}
+
+# ------------------------------------------------------------
 # 1. Remove Microsoft Store remnants
 # ------------------------------------------------------------
 Write-Host "[1/8] Removing Microsoft Store remnants..."
 Get-AppxPackage *ohmyposh* | Remove-AppxPackage -ErrorAction SilentlyContinue
+
+Write-Host "Disabling any existing Oh-My-Posh auto-init..."
+try {
+    oh-my-posh disable | Out-Null
+} catch {
+    Write-Host "No existing auto-init to disable or oh-my-posh not yet on PATH." -ForegroundColor DarkGray
+}
 
 # ------------------------------------------------------------
 # 2. Rename WindowsApps symlinks
@@ -80,7 +102,7 @@ Get-ChildItem -Path $fontsDir -Filter *.ttf | ForEach-Object {
 Write-Host "[7/8] Updating PATH..."
 
 $correctPath = "$env:LOCALAPPDATA\Programs\oh-my-posh"
-$regPath = "HKCU:\Environment"
+$regPath     = "HKCU:\Environment"
 
 $currentUserPath = (Get-ItemProperty -Path $regPath -Name Path -ErrorAction SilentlyContinue).Path
 
@@ -103,10 +125,16 @@ if (-not (Test-Path $profileDir)) {
     New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
 }
 
-$profileBlock = @"
-`$env:POSH_THEMES_PATH = "`$env:LOCALAPPDATA\Programs\oh-my-posh\themes"
-oh-my-posh init pwsh --config "`$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression
-"@
+if (Test-Path $PROFILE) {
+    Write-Host "Existing profile detected; replacing with SemperFix OMP block."
+    Remove-Item $PROFILE -Force
+}
+
+$profileBlock = @'
+# SemperFix OMP Profile Block v1.0.4
+$env:POSH_THEMES_PATH = "$env:LOCALAPPDATA\Programs\oh-my-posh\themes"
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression
+'@
 
 Set-Content -Path $PROFILE -Value $profileBlock
 
@@ -124,6 +152,15 @@ if (-not (Test-Path "$ompDir\themes\paradox.omp.json")) {
     Write-Host "ERROR: Missing theme." -ForegroundColor Red
 }
 
+Write-Host ""
+Write-Host "Profile contents:" -ForegroundColor Yellow
+try {
+    Get-Content $PROFILE
+} catch {
+    Write-Host "Unable to read profile: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host ""
 Write-Host "Verification complete." -ForegroundColor Green
 Write-Host "SemperFix OMP Package Version: $scriptVersion" -ForegroundColor Yellow
 Write-Host "Restart Windows Terminal to apply changes." -ForegroundColor Cyan

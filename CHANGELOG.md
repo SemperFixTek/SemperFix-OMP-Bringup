@@ -50,3 +50,15 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 - Improved JetBrainsMono Nerd Font installation feedback
 - Hardened persistent user `PATH` update for OMP install directory
 - Ensured PowerShell profile auto-configuration writes the correct theme path
+
+---
+
+## [1.0.4] - Installer hardening and MSIX compatibility
+### Added / Fixed
+- Updated `installer\install-semperfix-omp.ps1` to version `1.0.4`
+- Added PowerShell engine detection for MSIX vs system-installed PowerShell
+- Added cleanup for Microsoft Store Oh-My-Posh remnants before reinstall
+- Added WindowsApps symlink rename mitigation for conflicting Store installations
+- Improved SemperFix OMP install directory creation and binary/theme deployment flow
+- Hardened persistent user PATH updates and PowerShell profile initialization
+- Added clearer verification output for installed binary, theme, and profile state
