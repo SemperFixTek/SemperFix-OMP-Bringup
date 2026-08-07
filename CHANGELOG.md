@@ -62,3 +62,8 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 - Improved SemperFix OMP install directory creation and binary/theme deployment flow
 - Hardened persistent user PATH updates and PowerShell profile initialization
 - Added clearer verification output for installed binary, theme, and profile state
+
+---
+
+## [1.0.5] - Theme deterministic hardening
+- Hardened theme deployment by removing stale theme folders and copying the current theme set deterministically

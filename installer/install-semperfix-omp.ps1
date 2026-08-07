@@ -71,7 +71,17 @@ Copy-Item "$binDir\oh-my-posh.exe" "$ompDir\oh-my-posh.exe" -Force
 # 5. Copy themes
 # ------------------------------------------------------------
 Write-Host "[5/8] Installing themes..."
-Copy-Item $themesDir "$ompDir\themes" -Recurse -Force
+# Ensure themes directory exists and is clean
+$targetThemes = "$ompDir\themes"
+
+if (Test-Path $targetThemes) {
+    Remove-Item $targetThemes -Recurse -Force
+}
+
+New-Item -ItemType Directory -Path $targetThemes | Out-Null
+
+# Copy only the contents of the repo themes folder
+Copy-Item "$themesDir\*" $targetThemes -Recurse -Force
 
 # ------------------------------------------------------------
 # 6. Install fonts (admin-free)
