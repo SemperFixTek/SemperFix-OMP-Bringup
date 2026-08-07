@@ -65,5 +65,13 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 
 ---
 
-## [1.0.5] - Theme deterministic hardening
+## [1.0.6] - Installer version and theme configuration update
+### Added / Fixed
+- Updated `installer\install-semperfix-omp.ps1` to version `1.0.6`
 - Hardened theme deployment by removing stale theme folders and copying the current theme set deterministically
+- Centralized the selected theme filename in a configurable variable at the top of `installer\install-semperfix-omp.ps1`
+- Switched the installer to use the `microverse-power.omp.json` theme via a configurable `$themeFileName` variable
+- Updated the PowerShell profile initialization and verification logic to use the shared theme variable
+- Improved installer maintainability by reducing hard-coded theme references to a single definition
+- Ensured the profile initialization and verification steps reference the same theme definition
+- Kept the installer behavior aligned with the current SemperFix theme package layout

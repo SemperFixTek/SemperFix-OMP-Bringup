@@ -5,7 +5,8 @@ Maintainer: Bruce (SemperFix)
 Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
-$scriptVersion = "1.0.4"
+$scriptVersion = "1.0.6"
+$themeFileName = "microverse-power.omp.json"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 
@@ -143,7 +144,7 @@ if (Test-Path $PROFILE) {
 $profileBlock = @'
 # SemperFix OMP Profile Block v1.0.4
 $env:POSH_THEMES_PATH = "$env:LOCALAPPDATA\Programs\oh-my-posh\themes"
-oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\paradox.omp.json" | Invoke-Expression
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\$themeFileName" | Invoke-Expression
 '@
 
 Set-Content -Path $PROFILE -Value $profileBlock
@@ -158,7 +159,7 @@ if (-not (Test-Path "$ompDir\oh-my-posh.exe")) {
     Write-Host "ERROR: Missing binary." -ForegroundColor Red
 }
 
-if (-not (Test-Path "$ompDir\themes\paradox.omp.json")) {
+if (-not (Test-Path "$ompDir\themes\$themeFileName")) {
     Write-Host "ERROR: Missing theme." -ForegroundColor Red
 }
 
