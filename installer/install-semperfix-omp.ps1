@@ -6,7 +6,7 @@ Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
 $scriptVersion = "1.9.0"
-$themeFileName = "mt.omp.json"
+$themeFileName = "paradox.omp.json"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 
@@ -85,18 +85,37 @@ New-Item -ItemType Directory -Path $targetThemes | Out-Null
 Copy-Item "$themesDir\*" $targetThemes -Recurse -Force
 
 # ------------------------------------------------------------
-# 6. Deterministic JetBrainsMono Nerd Font Installation
+# 6. Deterministic JetBrainsMono Nerd Font Installation (Final)
 # ------------------------------------------------------------
-Write-Host "[6/8] Installing JetBrainsMono Nerd Font (deterministic system-level)..."
+Write-Host "[6/8] Installing JetBrainsMono Nerd Font (deterministic system-level)..." -ForegroundColor Cyan
 
 $systemFontsDir = "C:\Windows\Fonts"
 $fontRegPath    = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
 
-# Path where your installer stores the font files
-$fontsDir = Join-Path $PSScriptRoot "fonts"
+# ------------------------------------------------------------
+# Auto-detect fonts directory
+# ------------------------------------------------------------
+$possibleFonts = @(
+    [System.IO.Path]::Combine($repoRoot, "fonts"),
+    [System.IO.Path]::Combine($PSScriptRoot, "..\fonts"),
+    [System.IO.Path]::Combine($PSScriptRoot, "assets\fonts")
+)
 
-# 6A — Remove ALL JetBrainsMono fonts (system-level only)
-Write-Host "Removing conflicting JetBrainsMono fonts from system..."
+$fontsDir = $possibleFonts | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if (-not $fontsDir) {
+    Write-Host "ERROR: Could not locate fonts directory!" -ForegroundColor Red
+    Write-Host "Expected one of:" -ForegroundColor DarkGray
+    $possibleFonts | ForEach-Object { Write-Host " - $_" -ForegroundColor DarkGray }
+    exit 1
+}
+
+Write-Host "Fonts directory detected: $fontsDir" -ForegroundColor Green
+
+# ------------------------------------------------------------
+# Remove ALL JetBrainsMono fonts (system-level only)
+# ------------------------------------------------------------
+Write-Host "Removing conflicting JetBrainsMono fonts from system..." -ForegroundColor Yellow
 
 Get-ChildItem $systemFontsDir -Filter "*JetBrains*" | ForEach-Object {
     Write-Host "Removing system font: $($_.Name)"
@@ -111,35 +130,41 @@ Get-Item $fontRegPath | Get-ItemProperty | ForEach-Object {
     }
 }
 
-# 6B — Install ONE authoritative system-level Nerd Font
-Write-Host "Installing authoritative JetBrainsMono Nerd Font Complete (Regular)..."
+# ------------------------------------------------------------
+# Install ONE authoritative system-level Nerd Font
+# ------------------------------------------------------------
+Write-Host "Installing authoritative JetBrainsMono Nerd Font Complete (Regular)..." -ForegroundColor Yellow
 
 $primaryFont = Get-ChildItem -Path $fontsDir -Filter "*JetBrainsMonoNerdFont-Regular*.ttf" | Select-Object -First 1
 
 if ($primaryFont) {
-    Write-Host "Copying system font: $($primaryFont.Name)"
+    Write-Host "Copying system font: $($primaryFont.Name)" -ForegroundColor Green
     Copy-Item $primaryFont.FullName $systemFontsDir -Force
 
     # Register system font
     $fontName = $primaryFont.Name
     New-ItemProperty -Path $fontRegPath -Name $fontName -Value $fontName -PropertyType String -Force | Out-Null
 
-    Write-Host "System-level JetBrainsMono Nerd Font installed."
+    Write-Host "System-level JetBrainsMono Nerd Font installed." -ForegroundColor Green
 } else {
-    Write-Host "ERROR: JetBrainsMono Nerd Font Regular not found!" -ForegroundColor Red
+    Write-Host "ERROR: JetBrainsMono Nerd Font Regular not found in: $fontsDir" -ForegroundColor Red
+    Write-Host "Make sure the file exists and is named like:" -ForegroundColor DarkGray
+    Write-Host "JetBrainsMonoNerdFont-Regular.ttf" -ForegroundColor DarkGray
+    exit 1
 }
 
-# 6C — Refresh DirectWrite font cache
-Write-Host "Refreshing DirectWrite font cache..."
+# ------------------------------------------------------------
+# Refresh DirectWrite font cache
+# ------------------------------------------------------------
+Write-Host "Refreshing DirectWrite font cache..." -ForegroundColor Yellow
 try {
     Get-Process -Name "fontdrvhost" -ErrorAction SilentlyContinue | Stop-Process -Force
-    Write-Host "Font cache refreshed."
+    Write-Host "Font cache refreshed." -ForegroundColor Green
 } catch {
     Write-Host "Unable to refresh font cache automatically." -ForegroundColor DarkGray
 }
 
-Write-Host "Deterministic font installation complete."
-
+Write-Host "Deterministic font installation complete." -ForegroundColor Cyan
 
 # ------------------------------------------------------------
 # 7. Update PATH (persistent user PATH)
@@ -207,6 +232,24 @@ try {
 }
 
 Write-Host ""
-Write-Host "Verification complete." -ForegroundColor Green
-Write-Host "SemperFix OMP Package Version: $scriptVersion" -ForegroundColor Yellow
-Write-Host "Restart Windows Terminal to apply changes." -ForegroundColor Cyan
+Write-Host "`n==================================================" -ForegroundColor Cyan
+Write-Host "        SEMPERFIX OMP — INSTALLATION COMPLETE" -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
+
+Write-Host "`nEnvironment Summary:" -ForegroundColor Yellow
+Write-Host "• Windows Terminal: Ready"
+Write-Host "• JetBrainsMono Nerd Font (System-Level): Installed"
+Write-Host "• Oh My Posh: Activated"
+Write-Host "• SemperFix Theme: Linked"
+Write-Host "• PowerShell Profile: Updated"
+Write-Host "• DirectWrite Cache: Refreshed"
+Write-Host "• Deterministic Rendering: Enabled"
+
+Write-Host "`nNext Steps:" -ForegroundColor Yellow
+Write-Host "1. Restart Windows Terminal"
+Write-Host "2. Run:  C:\\SemperFix\\Diagnostics\\omp-full.ps1"
+Write-Host "3. Confirm all glyphs render correctly"
+
+Write-Host "`nSemperFix OMP is now operational." -ForegroundColor Green
+Write-Host "Welcome to your upgraded terminal environment." -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor Cyan
