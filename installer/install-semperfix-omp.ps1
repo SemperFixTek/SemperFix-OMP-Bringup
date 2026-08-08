@@ -6,7 +6,7 @@ Purpose: Deterministic Oh-My-Posh installation for Windows 10/11
 #>
 
 $scriptVersion = "1.9.0"
-$themeFileName = "craver.omp.json"
+$themeFileName = "mt.omp.json"
 
 Write-Host "=== SemperFix OMP Installer v$scriptVersion ===" -ForegroundColor Cyan
 
@@ -85,27 +85,96 @@ New-Item -ItemType Directory -Path $targetThemes | Out-Null
 Copy-Item "$themesDir\*" $targetThemes -Recurse -Force
 
 # ------------------------------------------------------------
-# 6. Install fonts (admin-free)
+# 6. Bulletproof JetBrainsMono Nerd Font Installation
 # ------------------------------------------------------------
-Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts..."
+Write-Host "[6/8] Installing JetBrainsMono Nerd Fonts (system + user)..."
 
+$systemFontsDir = "C:\Windows\Fonts"
+$userFontsDir   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+
+# Ensure per-user font directory exists
+if (-not (Test-Path $userFontsDir)) {
+    New-Item -ItemType Directory -Path $userFontsDir -Force | Out-Null
+}
+
+# 6A — Remove conflicting system-level JetBrainsMono fonts
+Write-Host "Scanning for conflicting system JetBrainsMono fonts..."
+
+Get-ChildItem $systemFontsDir -Filter "*JetBrains*" | ForEach-Object {
+    Write-Host "Removing conflicting system font: $($_.Name)"
+    Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
+}
+
+# Remove registry entries
+$fontRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
+Get-Item $fontRegPath | Get-ItemProperty | ForEach-Object {
+    $_.PSObject.Properties | Where-Object { $_.Value -like "*JetBrains*" } | ForEach-Object {
+        Write-Host "Removing registry font entry: $($_.Name)"
+        Remove-ItemProperty -Path $fontRegPath -Name $_.Name -ErrorAction SilentlyContinue
+    }
+}
+
+# 6B — Install ONE authoritative system-level font
+Write-Host "Installing authoritative system-level JetBrainsMono Nerd Font..."
+
+$primaryFont = Get-ChildItem -Path $fontsDir -Filter "*JetBrainsMonoNerdFont-Regular*.ttf" | Select-Object -First 1
+
+if ($primaryFont) {
+    Write-Host "Installing system font: $($primaryFont.Name)"
+    Copy-Item $primaryFont.FullName $systemFontsDir -Force
+
+    # Register system font
+    $fontName = $primaryFont.Name
+    New-ItemProperty -Path $fontRegPath -Name $fontName -Value $fontName -PropertyType String -Force | Out-Null
+} else {
+    Write-Host "ERROR: Primary JetBrainsMono Nerd Font Regular not found!" -ForegroundColor Red
+}
+
+# 6C — Install remaining fonts per-user (copy first, register second)
+Write-Host "Installing remaining Nerd Fonts per-user..."
+
+# First pass: copy all fonts BEFORE registering
+Get-ChildItem -Path $fontsDir -Filter *.ttf | ForEach-Object {
+    if ($_.Name -ne $primaryFont.Name) {
+        $target = Join-Path $userFontsDir $_.Name
+
+        try {
+            Copy-Item $_.FullName $target -Force
+            Write-Host "Copied per-user font: $($_.Name)"
+        }
+        catch {
+            Write-Host "WARNING: Could not copy (locked or in use): $($_.Name)" -ForegroundColor Yellow
+        }
+    }
+}
+
+# Second pass: register fonts AFTER copying
 Add-Type -Namespace Win32 -Name FontStuff -MemberDefinition @"
     [DllImport("gdi32.dll", SetLastError=true)]
     public static extern int AddFontResource(string lpFileName);
 "@
 
-Get-ChildItem -Path $fontsDir -Filter *.ttf | ForEach-Object {
-    $fontFile = $_.FullName
-    Write-Host "Installing font: $($_.Name)"
-
-    $result = [Win32.FontStuff]::AddFontResource($fontFile)
+Get-ChildItem -Path $userFontsDir -Filter *.ttf | ForEach-Object {
+    $result = [Win32.FontStuff]::AddFontResource($_.FullName)
 
     if ($result -gt 0) {
-        Write-Host "Font installed successfully: $($_.Name)"
+        Write-Host "Registered per-user font: $($_.Name)"
     } else {
-        Write-Host "WARNING: Font may already be installed or registration failed: $($_.Name)" -ForegroundColor Yellow
+        Write-Host "WARNING: Registration may have failed: $($_.Name)" -ForegroundColor Yellow
     }
 }
+
+
+# 6D — Refresh DirectWrite font cache
+Write-Host "Refreshing DirectWrite font cache..."
+try {
+    Get-Process -Name "fontdrvhost" -ErrorAction SilentlyContinue | Stop-Process -Force
+    Write-Host "Font cache refreshed."
+} catch {
+    Write-Host "Unable to refresh font cache automatically." -ForegroundColor DarkGray
+}
+
+Write-Host "JetBrainsMono Nerd Font installation complete."
 
 # ------------------------------------------------------------
 # 7. Update PATH (persistent user PATH)
