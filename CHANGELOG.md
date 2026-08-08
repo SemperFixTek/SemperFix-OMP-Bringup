@@ -81,9 +81,17 @@ Used for testing installer behavior, release mechanics, certification workflow, 
 
 ## [2.0.0] — 2026-08-07
 ### Added / Fixed
-- Updated `installer\install-semperfix-omp.ps1` to version `2.0.0`
-- Improved the installer flow for cleaner, more repeatable Oh-My-Posh setup on Windows 10/11
-- Strengthened PowerShell engine detection for MSIX and system-installed `pwsh` environments
-- Improved cleanup of Microsoft Store and WindowsApps remnants before reinstalling Oh-My-Posh
-- Standardized theme deployment around the SemperFix theme bundle with a configurable theme filename
-- Hardened PowerShell profile initialization and verification output for more reliable onboarding
+- Updated `installer\install-semperfix-omp.ps1` to version `2.0.0` and aligned the installer flow with the current SemperFix deployment workflow for Windows 10/11.
+- Strengthened PowerShell engine detection for MSIX and system-installed `pwsh` environments so the script uses the correct runtime path.
+- Improved cleanup of Microsoft Store and WindowsApps remnants before reinstalling Oh-My-Posh to reduce conflicts and stale shortcuts.
+- Standardized theme deployment by removing stale theme folders and copying the SemperFix theme bundle deterministically from the repo.
+- Added deterministic JetBrainsMono Nerd Font installation, including cleanup of conflicting system fonts, registration of the authoritative font, and DirectWrite cache refresh.
+- Hardened persistent user PATH updates and PowerShell profile initialization so the installed binary, theme path, and startup block remain consistent.
+- Expanded verification output to confirm the installed binary, theme file, and PowerShell profile state after setup.
+
+---
+
+## [2.1.0] — 2026-08-07
+### Added
+- Added diagnostics/omp-full-diag.ps1 to provide a full Oh My Posh environment diagnostic flow for glyph rendering, font support, Powerline separators, theme loading, and overall terminal readiness.
+- Included a structured verification checklist for color scheme, padding, and final operational status in the new diagnostic script.
